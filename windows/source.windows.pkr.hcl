@@ -46,9 +46,9 @@ source "proxmox-iso" "base" {
   }
 
   additional_iso_files {
-    cd_files = ["${path.root}/scripts/build/Configure-RemotingForAnsible.ps1"]
+    cd_files = ["${path.root}/scripts/Configure-RemotingForAnsible.ps1"]
     cd_content = {
-      "autounattend.xml" = templatefile("${path.root}/assets/base/unattend.pkrtpl", {
+      "autounattend.xml" = templatefile("${path.root}/assets/unattend.pkrtpl", {
         user               = var.install_user,
         password           = var.install_password,
         cdrom_drive        = var.cdrom_drive,
