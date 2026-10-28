@@ -128,3 +128,16 @@ variable "timezone" {
   description = "Windows timezone"
   default     = "UTC"
 }
+
+variable "install_user" {
+  type        = string
+  default     = "Administrator"
+  description = "Default Windows user"
+}
+
+variable "install_password" {
+  type        = string
+  default     = "" # Must be set in variables.pkrvars.hcl or via environment variable for security reasons
+  sensitive   = true
+  description = "Password for the default user"
+}

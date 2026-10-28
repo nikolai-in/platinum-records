@@ -22,9 +22,9 @@ socket = 1
 bridge = "vmbr0"
 
 # Windows settings
-install_user     = "Administrator"
-install_password = "YourSecurePassword123!"
-timezone         = "UTC"
+install_user = "Administrator"
+# install_password = "theBirdOfHermesIsMyNameEatingMyWingsToMakeMeTame"
+timezone = "UTC"
 
 # License keys (optional - leave empty for evaluation versions)
 license_keys = {
