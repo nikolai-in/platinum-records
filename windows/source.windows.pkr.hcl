@@ -1,16 +1,3 @@
-packer {
-  required_plugins {
-    proxmox = {
-      version = "~> 1.2.4"
-      source  = "github.com/hashicorp/proxmox"
-    }
-    windows-update = {
-      version = "~> 0.18.5"
-      source  = "github.com/rgl/windows-update"
-    }
-  }
-}
-
 source "proxmox-iso" "base" {
 
   // PROXMOX CONNECTION CONFIGURATION
@@ -46,9 +33,9 @@ source "proxmox-iso" "base" {
   }
 
   additional_iso_files {
-    cd_files = ["${path.root}/scripts/Configure-RemotingForAnsible.ps1"]
+    cd_files = ["${local.scripts_dir}/Configure-RemotingForAnsible.ps1"]
     cd_content = {
-      "autounattend.xml" = templatefile("${path.root}/assets/unattend.pkrtpl", {
+      "autounattend.xml" = templatefile("${local.assets_dir}/unattend.pkrtpl", {
         user               = var.install_user,
         password           = var.install_password,
         cdrom_drive        = var.cdrom_drive,
@@ -69,9 +56,9 @@ source "proxmox-iso" "base" {
   // VM TEMPLATE CONFIGURATION
   template_name        = local.image_properties.base_template
   vm_id                = local.image_properties.base_vm_id
-  vm_name              = "win-instance-${formatdate("YYYYMMDD-hhmmss", timestamp())}"
-  template_description = "Windows ${var.image_os} Base Image\nBirthday: ${formatdate("EEE, DD MMM YYYY hh:mm:ss ZZZ", timestamp())}"
-  os                   = "win11"
+  vm_name              = "${local.image_properties.base_template}-build-${formatdate("YYYYMMDD-hhmmss", local.build_time)}"
+  template_description = "Windows ${var.image_os} Base Image\nBirthday: ${formatdate("EEE, DD MMM YYYY hh:mm:ss ZZZ", local.build_time)}"
+  os                   = local.image_properties.os_type
 
   // HARDWARE CONFIGURATION
   memory          = var.memory
@@ -80,6 +67,10 @@ source "proxmox-iso" "base" {
   cpu_type        = "host"
   scsi_controller = "virtio-scsi-pci"
   serials         = ["socket"]
+
+  // CLOUD-INIT DRIVE (consumed by Cloudbase-Init on clones)
+  cloud_init              = true
+  cloud_init_storage_pool = var.cloud_init_storage
 
   // NETWORK CONFIGURATION
   network_adapters {
@@ -109,4 +100,16 @@ source "proxmox-iso" "base" {
   boot         = "order=scsi0"
   boot_wait    = "3s"
   boot_command = ["<enter><enter>", "\\efi\\boot\\bootx64.efi<enter><wait>", "<enter>"]
+}
+
+// Debug source: runs the provisioners against an already-running VM
+source "null" "winrm" {
+  communicator   = "winrm"
+  winrm_host     = var.winrm_host
+  winrm_username = var.install_user
+  winrm_password = var.install_password
+  winrm_timeout  = "1h"
+  winrm_port     = "5986"
+  winrm_use_ssl  = true
+  winrm_insecure = true
 }
