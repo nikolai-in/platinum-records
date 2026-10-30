@@ -75,8 +75,9 @@ source "proxmox-iso" "base" {
 
   // NETWORK CONFIGURATION
   network_adapters {
-    model  = "virtio"
-    bridge = var.bridge
+    model    = "virtio"
+    bridge   = var.bridge
+    vlan_tag = var.vlan_tag
   }
 
   // STORAGE CONFIGURATION

@@ -18,6 +18,7 @@
                 <UILanguage>en-US</UILanguage>
             </SetupUILanguage>
         </component>
+%{ if length(driver_paths) > 0 ~}
         <component
       xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -35,6 +36,7 @@
 %{ endfor ~}
             </DriverPaths>
         </component>
+%{ endif ~}
         <component
       name="Microsoft-Windows-Setup"
       processorArchitecture="amd64"
@@ -46,9 +48,9 @@
     >
             <UserData>
                 <AcceptEula>true</AcceptEula>
-%{ if license_key != "" ~}
+%{ if license_key != null && trimspace(license_key) != "" ~}
                 <ProductKey>
-                    <Key>${license_key}</Key>
+                    <Key>${trimspace(license_key)}</Key>
                     <WillShowUI>OnError</WillShowUI>
                 </ProductKey>
 %{ endif ~}
@@ -77,17 +79,17 @@
                     <ModifyPartitions>
                         <ModifyPartition wcm:action="add">
                             <Order>1</Order>
-                            <PartitionId>1</PartitionId>
+                            <PartitionID>1</PartitionID>
                             <Format>FAT32</Format>
                             <Label>System</Label>
                         </ModifyPartition>
                         <ModifyPartition wcm:action="add">
                             <Order>2</Order>
-                            <PartitionId>2</PartitionId>
+                            <PartitionID>2</PartitionID>
                         </ModifyPartition>
                         <ModifyPartition wcm:action="add">
                             <Order>3</Order>
-                            <PartitionId>3</PartitionId>
+                            <PartitionID>3</PartitionID>
                             <Format>NTFS</Format>
                             <Label>Windows</Label>
                             <Letter>C</Letter>
@@ -154,7 +156,8 @@
             <FirewallGroups>
                 <FirewallGroup wcm:action="add" wcm:keyValue="RemoteDesktop">
                     <Active>true</Active>
-                    <Group>Remote Desktop</Group>
+                    <!-- Locale-independent name of the "Remote Desktop" rule group -->
+                    <Group>@FirewallAPI.dll,-28752</Group>
                     <Profile>all</Profile>
                 </FirewallGroup>
             </FirewallGroups>
@@ -171,7 +174,7 @@
             <SecurityLayer>2</SecurityLayer>
             <UserAuthentication>1</UserAuthentication>
         </component>
-        <!-- Server editions only; ignored on Windows 10/11 -->
+        <!-- Server editions only; ignored on Windows 10 -->
         <component
       name="Microsoft-Windows-ServerManager-SvrMgrNc"
       processorArchitecture="amd64"
@@ -185,6 +188,21 @@
         </component>
     </settings>
     <settings pass="oobeSystem">
+        <!-- Without this, Windows 10 OOBE can stop at the region/keyboard pages -->
+        <component
+      name="Microsoft-Windows-International-Core"
+      processorArchitecture="amd64"
+      publicKeyToken="31bf3856ad364e35"
+      language="neutral"
+      versionScope="nonSxS"
+      xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    >
+            <InputLocale>en-US</InputLocale>
+            <SystemLocale>en-US</SystemLocale>
+            <UILanguage>en-US</UILanguage>
+            <UserLocale>en-US</UserLocale>
+        </component>
         <component
       name="Microsoft-Windows-Shell-Setup"
       processorArchitecture="amd64"
@@ -210,31 +228,29 @@
                 <ProtectYourPC>3</ProtectYourPC>
             </OOBE>
             <TimeZone>${timezone}</TimeZone>
-            <FirstLogonCommands>
-                <SynchronousCommand wcm:action="add">
-                    <CommandLine
-          >${virtio_cdrom_drive}\virtio-win-guest-tools.exe /install /passive /norestart</CommandLine>
-                    <Description>Install Guest Tools</Description>
-                    <Order>1</Order>
-                    <RequiresUserInput>false</RequiresUserInput>
-                </SynchronousCommand>
-                <SynchronousCommand wcm:action="add">
-                    <CommandLine
-          >powershell -ExecutionPolicy Bypass -File ${cdrom_drive}\Configure-RemotingForAnsible.ps1 -EnableCredSSP</CommandLine>
-                    <Description>Enable Ansible Remote</Description>
-                    <RequiresUserInput>false</RequiresUserInput>
-                    <Order>2</Order>
-                </SynchronousCommand>
-            </FirstLogonCommands>
             <AutoLogon>
+                <Enabled>true</Enabled>
                 <LogonCount>1</LogonCount>
                 <Username>${user}</Username>
-                <Enabled>true</Enabled>
                 <Password>
                     <Value>${password}</Value>
                     <PlainText>true</PlainText>
                 </Password>
             </AutoLogon>
+            <FirstLogonCommands>
+                <SynchronousCommand wcm:action="add">
+                    <Order>1</Order>
+                    <CommandLine>${virtio_cdrom_drive}\virtio-win-guest-tools.exe /install /passive /norestart</CommandLine>
+                    <Description>Install Guest Tools</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <Order>2</Order>
+                    <CommandLine>powershell -ExecutionPolicy Bypass -File ${cdrom_drive}\Configure-RemotingForAnsible.ps1 -EnableCredSSP</CommandLine>
+                    <Description>Enable Ansible Remote</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+            </FirstLogonCommands>
         </component>
     </settings>
 </unattend>

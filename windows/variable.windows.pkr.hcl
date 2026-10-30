@@ -95,6 +95,12 @@ variable "bridge" {
   default     = "vmbr0"
 }
 
+variable "vlan_tag" {
+  type        = string
+  description = "VLAN ID for the build VM's NIC (leave empty for untagged)"
+  default     = ""
+}
+
 variable "vm_ids" {
   type        = map(number)
   description = "Optional fixed Proxmox VM IDs for the resulting templates, keyed by image_os (e.g. { win22 = 9022 }). Missing or 0 lets Proxmox pick."
