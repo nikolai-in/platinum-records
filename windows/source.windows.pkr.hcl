@@ -4,7 +4,8 @@ source "proxmox-iso" "base" {
   proxmox_url              = var.proxmox_url
   insecure_skip_tls_verify = var.proxmox_insecure
   username                 = var.proxmox_user
-  password                 = var.proxmox_password
+  password                 = var.proxmox_password != "" ? var.proxmox_password : null
+  token                    = var.proxmox_token != "" ? var.proxmox_token : null
   node                     = var.node
 
   // BIOS & MACHINE CONFIGURATION

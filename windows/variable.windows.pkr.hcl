@@ -18,8 +18,16 @@ variable "proxmox_user" {
 
 variable "proxmox_password" {
   type        = string
-  description = "Proxmox password"
+  description = "Proxmox password (leave empty when using a token)"
   sensitive   = true
+  default     = ""
+}
+
+variable "proxmox_token" {
+  type        = string
+  description = "Proxmox API token secret (leave empty when using a password)"
+  sensitive   = true
+  default     = ""
 }
 
 variable "node" {
