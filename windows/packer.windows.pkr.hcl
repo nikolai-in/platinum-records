@@ -52,7 +52,7 @@ build {
   // component cleanup, clears temp files / event logs, and zeroes
   // free space so Proxmox thin-provisioned storage can reclaim blocks.
   provisioner "powershell" {
-    script = "${local.scripts_dir}/build/Optimize-BaseImage.ps1"
+    script = "${local.scripts_dir}/Optimize-BaseImage.ps1"
     // DISM /ResetBase alone can take 15-30 minutes; zeroing free space
     // adds another 5-20 minutes depending on disk size.
     timeout = "45m"
@@ -64,7 +64,7 @@ build {
   }
 
   provisioner "powershell" {
-    script = "${local.scripts_dir}/build/Install-CloudBase.ps1"
+    script = "${local.scripts_dir}/Install-CloudBase.ps1"
   }
 
   provisioner "file" {
