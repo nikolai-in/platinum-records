@@ -103,13 +103,13 @@ source "proxmox-iso" "base" {
 }
 
 // Debug source: runs the provisioners against an already-running VM
-source "null" "winrm" {
-  communicator   = "winrm"
-  winrm_host     = var.winrm_host
-  winrm_username = var.install_user
-  winrm_password = var.install_password
-  winrm_timeout  = "1h"
-  winrm_port     = "5986"
-  winrm_use_ssl  = true
-  winrm_insecure = true
-}
+# source "null" "winrm" {
+#   communicator   = "winrm"
+#   winrm_host     = var.winrm_host
+#   winrm_username = var.install_user
+#   winrm_password = var.install_password
+#   winrm_timeout  = "1h"
+#   winrm_port     = "5986"
+#   winrm_use_ssl  = true
+#   winrm_insecure = true
+# }

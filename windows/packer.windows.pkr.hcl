@@ -24,7 +24,7 @@ build {
 
   sources = [
     "source.proxmox-iso.base",
-    "source.null.winrm",
+    # "source.null.winrm",
   ]
 
   provisioner "windows-restart" {
@@ -68,7 +68,7 @@ build {
   }
 
   provisioner "file" {
-    source      = "${local.assets_dir}/base/config/"
+    source      = "${local.assets_dir}/cloudbase-init/"
     destination = "C:/Program Files/Cloudbase Solutions/Cloudbase-Init/conf"
   }
 

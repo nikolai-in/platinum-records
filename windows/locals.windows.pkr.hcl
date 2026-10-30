@@ -34,6 +34,24 @@ locals {
       os_type       = "win10"
       base_template = "windows-10-base"
     }
+    "win11" = {
+      image_index   = "1" # Enterprise / Enterprise LTSC single-edition ISOs. Override with var.image_index for multi-edition ISOs.
+      disk_size     = "64G"
+      os_type       = "win11"
+      base_template = "windows-11-base"
+    },
+    "win16" = {
+      image_index   = "1" # Datacenter
+      disk_size     = "32G"
+      os_type       = "win10" # Proxmox uses the "win10" OS type for Server 2016/2019
+      base_template = "windows-2016-base"
+    },
+    "win19" = {
+      image_index   = "1" # Datacenter
+      disk_size     = "32G"
+      os_type       = "win10" # Proxmox uses the "win10" OS type for Server 2016/2019
+      base_template = "windows-2019-base"
+    },
     "win22" = {
       image_index   = "4" # Datacenter (Desktop Experience)
       disk_size     = "32G"
