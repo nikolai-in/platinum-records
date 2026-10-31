@@ -1,8 +1,3 @@
-#!powershell
-# Attribution: Vendored from the Ansible project.
-# Source:      https://github.com/ansible/ansible-documentation/blob/devel/examples/scripts/ConfigureRemotingForAnsible.ps1
-# License:     GNU General Public License v3.0 (GPL-3.0)
-#              https://github.com/ansible/ansible/blob/devel/COPYING
 #Requires -Version 3.0
 
 # Configure a Windows host for remote management with Ansible
@@ -51,12 +46,35 @@
 # Use option -SubjectName to specify the CN name of the certificate. This
 # defaults to the system's hostname and generally should not be specified.
 
+# Written by Trond Hindenes <trond@hindenes.com>
+# Updated by Chris Church <cchurch@ansible.com>
+# Updated by Michael Crilly <mike@autologic.cm>
+# Updated by Anton Ouzounov <Anton.Ouzounov@careerbuilder.com>
+# Updated by Nicolas Simond <contact@nicolas-simond.com>
+# Updated by Dag Wieërs <dag@wieers.com>
+# Updated by Jordan Borean <jborean93@gmail.com>
+# Updated by Erwan Quélin <erwan.quelin@gmail.com>
+# Updated by David Norman <david@dkn.email>
+#
+# Version 1.0 - 2014-07-06
+# Version 1.1 - 2014-11-11
+# Version 1.2 - 2015-05-15
+# Version 1.3 - 2016-04-04
+# Version 1.4 - 2017-01-05
+# Version 1.5 - 2017-02-09
+# Version 1.6 - 2017-04-18
+# Version 1.7 - 2017-11-23
+# Version 1.8 - 2018-02-23
+# Version 1.9 - 2018-09-21
+
+# Support -Verbose option
 [CmdletBinding()]
 
 Param (
     [string]$SubjectName = $env:COMPUTERNAME,
     [int]$CertValidityDays = 1095,
     [switch]$SkipNetworkProfileCheck,
+    $CreateSelfSignedCert = $true,
     [switch]$ForceNewSSLCert,
     [switch]$GlobalHttpFirewallAccess,
     [switch]$DisableBasicAuth = $false,
@@ -81,15 +99,10 @@ Function Write-HostLog {
 }
 
 Function New-LegacySelfSignedCert {
-    [CmdletBinding(SupportsShouldProcess=$true)]
     Param (
         [string]$SubjectName,
         [int]$ValidDays = 1095
     )
-
-    if (-not $PSCmdlet.ShouldProcess($SubjectName, "Create Legacy Self-Signed Certificate")) {
-        return $null
-    }
 
     $hostnonFQDN = $env:computerName
     $hostFQDN = [System.Net.Dns]::GetHostByName(($env:computerName)).Hostname
@@ -288,7 +301,7 @@ $token_prop_name = "LocalAccountTokenFilterPolicy"
 $token_key = Get-Item -Path $token_path
 $token_value = $token_key.GetValue($token_prop_name, $null)
 if ($token_value -ne 1) {
-    Write-Verbose "Setting LocalAccountTokenFilterPolicy to 1"
+    Write-Verbose "Setting LocalAccountTOkenFilterPolicy to 1"
     if ($null -ne $token_value) {
         Remove-ItemProperty -Path $token_path -Name $token_prop_name
     }
@@ -304,13 +317,13 @@ If (!($listeners | Where-Object { $_.Keys -like "TRANSPORT=HTTPS" })) {
 
     # Create the hashtables of settings to be used.
     $valueset = @{
-        Hostname              = $SubjectName
+        Hostname = $SubjectName
         CertificateThumbprint = $thumbprint
     }
 
     $selectorset = @{
         Transport = "HTTPS"
-        Address   = "*"
+        Address = "*"
     }
 
     Write-Verbose "Enabling SSL listener."
@@ -329,12 +342,12 @@ Else {
 
         $valueset = @{
             CertificateThumbprint = $thumbprint
-            Hostname              = $SubjectName
+            Hostname = $SubjectName
         }
 
         # Delete the listener for SSL
         $selectorset = @{
-            Address   = "*"
+            Address = "*"
             Transport = "HTTPS"
         }
         Remove-WSManInstance -ResourceURI 'winrm/config/Listener' -SelectorSet $selectorset

@@ -246,11 +246,28 @@
                 </SynchronousCommand>
                 <SynchronousCommand wcm:action="add">
                     <Order>2</Order>
+                    <CommandLine>powershell -ExecutionPolicy Bypass -Command "Get-NetConnectionProfile | Set-NetConnectionProfile -NetworkCategory Private"</CommandLine>
+                    <Description>Set network Private</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <Order>3</Order>
+                    <CommandLine>powershell -ExecutionPolicy Bypass -Command "New-NetFirewallRule -DisplayName 'Allow ICMPv4 Echo In' -Protocol ICMPv4 -IcmpType 8 -Direction Inbound -Action Allow"</CommandLine>
+                    <Description>Allow ping</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <Order>4</Order>
+                    <CommandLine>powershell -ExecutionPolicy Bypass -Command "Enable-NetFirewallRule -DisplayGroup 'Windows Remote Management'"</CommandLine>
+                    <Description>Allow WinRM in firewall</Description>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <Order>5</Order>
                     <CommandLine>powershell -ExecutionPolicy Bypass -File ${cdrom_drive}\Configure-RemotingForAnsible.ps1 -EnableCredSSP</CommandLine>
                     <Description>Enable Ansible Remote</Description>
                     <RequiresUserInput>false</RequiresUserInput>
-                </SynchronousCommand>
-            </FirstLogonCommands>
+                </SynchronousCommand>            </FirstLogonCommands>
         </component>
     </settings>
 </unattend>

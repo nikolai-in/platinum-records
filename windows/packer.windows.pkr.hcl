@@ -71,11 +71,4 @@ build {
     source      = "${local.assets_dir}/cloudbase-init/"
     destination = "C:/Program Files/Cloudbase Solutions/Cloudbase-Init/conf"
   }
-
-  provisioner "powershell" {
-    inline = [
-      "Set-Service cloudbase-init -StartupType Manual",
-      "Stop-Service cloudbase-init -Force -Confirm:$false"
-    ]
-  }
 }

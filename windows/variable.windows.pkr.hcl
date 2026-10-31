@@ -101,6 +101,12 @@ variable "vlan_tag" {
   default     = ""
 }
 
+variable "mac_address" {
+  type        = string
+  description = "Optional MAC address for the build VM's NIC (leave empty for Proxmox to assign). Useful for small dhcp pools."
+  default     = ""
+}
+
 variable "vm_ids" {
   type        = map(number)
   description = "Optional fixed Proxmox VM IDs for the resulting templates, keyed by image_os (e.g. { win22 = 9022 }). Missing or 0 lets Proxmox pick."
